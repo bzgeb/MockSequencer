@@ -9,6 +9,8 @@ int extraSpace = 0;
 
 Button[] buttons;
 Button clicked;
+
+WheelButton[] wheels;
 PVector lastMousePos;
 
 void setup() {
@@ -16,6 +18,7 @@ void setup() {
   noStroke();
   frameRate(60);
   
+  // Init Buttons
   buttons = new Button[12 * 16];
   
   for ( int i = 0; i < 12; ++i ) {
@@ -37,6 +40,12 @@ void setup() {
         buttonSize, buttonSize);
     } 
   }
+  
+  // Init Wheels
+  wheels = new WheelButton[5];
+  for (int w = 0; w < 5; ++w ) {
+    wheels[w] = new WheelButton(925, 20 + w * 120, buttonSize + 40, buttonSize + 40);
+  }
 }
 
 void draw() {
@@ -45,6 +54,14 @@ void draw() {
       buttons[j + (i * 16)].draw();
     }    
   }
+  
+  for ( int w = 0; w < 5; ++w ) {
+    wheels[w].draw();  
+  }
+  
+  rect(945, 685, buttonSize, buttonSize, 
+      buttonCornerRadius, buttonCornerRadius, buttonCornerRadius, buttonCornerRadius);
+  text("ON", 945, 685); 
 }
 
 void keyPressed() {
@@ -59,7 +76,6 @@ void mousePressed() {
       clicked = buttons[i]; 
       lastMousePos = new PVector(mouseX, mouseY);
     }
-//    buttons[i].handleInput();
   } 
 }
 
@@ -86,7 +102,7 @@ class Button extends java.awt.Rectangle {
   Button(int x, int y, int width, int height) {
     super(x, y, width, height);
     slider = new CircleSlider(buttonCenterRadius, 360, x + width / 2, y + height / 2);
-    slider.setLevel(0.6f);
+    slider.setLevel(0f);
   }
   
   public void draw() {
@@ -118,6 +134,25 @@ class Button extends java.awt.Rectangle {
   }
 }
 
+class WheelButton extends java.awt.Rectangle {
+  Wheel wheel;
+ 
+  WheelButton( int x, int y, int width, int height ) {
+    super( x, y, width, height );
+    wheel = new Wheel( 35, 180, x + width / 2, y + height / 2 );
+  } 
+  
+  public void draw() {
+    fill( 255, 255, 255 );
+    rect( x, y, width, height, buttonCornerRadius, buttonCornerRadius, buttonCornerRadius, buttonCornerRadius );
+    
+    wheel.draw();
+    
+    fill( 255, 255, 255 );
+    ellipse(x + width / 2, y + height / 2, buttonCenterCenterRadius, buttonCenterCenterRadius);
+  }
+}
+
 /****************
 * Circle Slider
 *****************/
@@ -135,6 +170,7 @@ class CircleSlider {
     this.x = x;
     this.y = y;
     initVertices( radius );
+    
     
     setLevel(1);
   }
@@ -175,5 +211,57 @@ class CircleSlider {
   
   public void increaseLevel( float amount ) {
     setLevel( this.level + amount ); 
+  }
+}
+
+
+/**************
+* WHEEL
+**************/
+class Wheel {
+  PVector[] vertices;
+  int sections;
+  float x;
+  float y;
+  
+  PShape shape;
+  
+  Wheel( float radius, int sections, float x, float y ) {
+    this.sections = sections;
+    this.x = x;
+    this.y = y; 
+    
+    initVertices( radius );
+    initShape();
+  }
+  
+  static final float DEG2RAD = PI / 180;
+  private void initVertices( float radius ) {
+    vertices = new PVector[sections + 2];
+    vertices[0] = new PVector(0, 0);
+    for(int i = 0; i <= sections; ++i){
+      float angle = i * PI / sections - (180 * DEG2RAD);
+      float vx = cos(angle) * radius;
+      float vy = sin(angle) * radius;
+    
+      vertices[i + 1] = new PVector(vx, vy);
+    }
+  }
+  
+  private void initShape() {
+    shape = createShape();
+    shape.beginShape(TRIANGLE_FAN);
+    shape.noStroke();
+    shape.fill(169, 221, 250);
+  
+    shape.vertex(vertices[0].x, vertices[0].y);
+    for(int i = 0; i <= sections; ++i) {
+      shape.vertex(vertices[i].x, vertices[i].y);
+    }
+    shape.endShape(CLOSE); 
+  }
+  
+  public void draw() {
+    shape(shape, x, y);
   }
 }
