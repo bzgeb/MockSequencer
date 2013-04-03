@@ -4,7 +4,7 @@ int buttonBottomMargin = buttonSize + 10;
 int buttonCornerRadius = 8;
 
 int buttonCenterRadius = 16;
-int buttonCenterCenterRadius = 16;
+int buttonCenterCenterRadius = 20;
 int extraSpace = 0;
 
 Button[] buttons;
@@ -61,7 +61,8 @@ void draw() {
   
   rect(945, 685, buttonSize, buttonSize, 
       buttonCornerRadius, buttonCornerRadius, buttonCornerRadius, buttonCornerRadius);
-  text("ON", 945, 685); 
+  fill(0, 0, 0);
+  text("ON", 958, 712); 
 }
 
 void keyPressed() {
@@ -149,7 +150,7 @@ class WheelButton extends java.awt.Rectangle {
     wheel.draw();
     
     fill( 255, 255, 255 );
-    ellipse(x + width / 2, y + height / 2, buttonCenterCenterRadius, buttonCenterCenterRadius);
+    ellipse(x + width / 2, y + height / 2, buttonCenterCenterRadius + 10, buttonCenterCenterRadius + 10);
   }
 }
 
